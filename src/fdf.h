@@ -107,8 +107,8 @@ typedef struct s_main_info {
 	int				screen_width;
 	int				screen_height;
 
-	unsigned int	colorHigh;
-	unsigned int	colorLow;
+	unsigned int	colorHigh;	// not yet implemented
+	unsigned int	colorLow;	// not yet implemented
 	SDL_Window		*window;
 	SDL_Renderer	*renderer;
 	int				error_code;
@@ -122,6 +122,7 @@ char	*ft_strjoin(char const *s1, char const *s2);
 char	**ft_split(char const *s, char c);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 void	*ft_memset(void *s, int c, size_t n);
+int		ft_atoi(const char *nb);
 void	multiplyMatrix(float a[4][4], float b[4][4], float result[4][4]);
 void	matrix_multiply(float projection_matrix[4][4], t_vec4 *pos);
 t_vec4	orthographic(t_main_info *main_info, float matrix[4][4], int i, int j);
@@ -145,6 +146,9 @@ void	translate_handler(SDL_Event event, t_main_info *main_info, bool type);
 void	init_keys(t_main_info *main_info);
 void	init_matrices(t_main_info *main_info);
 void	init_pos(t_main_info *main_info);
+
+// map_init.c
+int		validate_input(char **argv, t_main_info *main_info);
 
 // file_lst.c
 void		ft_file_lstclear(t_file_lst **lst, void (*del)(void*));

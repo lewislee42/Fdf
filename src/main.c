@@ -13,118 +13,6 @@
 
 #include "fdf.h"
 
-// int	freeing_2darr(char **content, int len) {
-// 	int i = 0;
-// 	while (i < len)
-// 		free(content[i++]);
-// 	free(content);
-// 	return (1);
-// }
-
-// int	skip_whitespace(char **content, int arr_len, int increment, int start_pos) {
-// 	int i = 0;
-
-// 	if (arr_len == 0 || !content || !*content)
-// 		return (-1);
-	
-// 	while (start_pos >= 0 && content[start_pos]) {
-// 		i = -1;
-// 		while (content[start_pos][++i]) {
-// 			if (content[start_pos][i] != ' ' && content[start_pos][i] != '\n')
-// 				return (start_pos);
-// 		}
-// 		start_pos++;
-// 	}
-// 	return (-1);
-// }
-
-// need 2 checkers
-//	one for checking if all positions are numbers and not alphabets
-//	one for checking the rest of the HIGH LOW maybe adding MIDDLE in the future
-
-int	validate_input(char **argv, t_main_info *main_info) {
-	// checking file format
-	if (!argv[1])
-		return (1);
-	int	first_stringLen = ft_strlen(argv[1]);
-	if (!(argv[1][first_stringLen--] == 'f' && argv[1][first_stringLen--] == 'd' && argv[1][first_stringLen] == 'f'))
-		return (1);
-
-	// checking file existing
-	int fd = open(argv[1], O_RDONLY);
-	if (fd < 0)
-		return (1);
-
-	// getting file content
-	int fd;
-	char *buffer;
-	t_file_lst *full_list = NULL;
-	t_file_lst *new_node;
-	
-	fd = open("out", O_RDONLY);
-	if (fd < 0) {
-		printf("Error out file failed to open\n");
-		return (1);
-	}
-	
-	buffer = get_next_line(fd);
-	while (buffer) {
-		new_node = create_filenode(buffer);
-		if (!new_node) {
-			// do error handling
-		}
-			
-		ft_file_lstadd_back(&full_list, new_node);
-		
-		// tmp = fullstring;
-		// fullstring = ft_strjoin(fullstring, buffer);
-		// free(tmp);
-		
-		buffer = get_next_line(fd);
-	}
-
-	t_file_lst	*tmp = full_list;
-	while (tmp)  {
-		printf("%s\n", tmp->s);
-		tmp = tmp->next;
-	}
-
-	// close(fd);
-	// char	**content = ft_split(file_content, '\n');
-	// if (!content) {
-	// 	free(file_content);
-	// 	return (1);
-	// }
-	
-	// int map_start_index = skip_whitespace(content, arr_len, 1, 0);
-	// int map_end_index;
-	// int map_info_start_index;
-	// int map_info_end_index;
-	
-
-
-	return (0);
-}
-
-// TODO: fix this for proper input file
-int	validate_input(char **argv, t_main_info *main_info) {
-	// hardcoded currently 
-	(void)argv;
-	main_info->map = ft_split("11111\n10001\n10001\n10001\n11111", '\n');
-	main_info->map_x = 5;
-	main_info->map_y = 5;
-
-	// printing map
-	printf("Current map:\n");
-	for (int i = 0; i < main_info->map_y; i++) {
-		for (int j = 0; j < main_info->map_x; j++)
-			printf("%c ", main_info->map[i][j]);
-		printf("\n");
-	}
-
-	return (0);
-}
-
 // TODO:
 // 	need to add a freeing/cleanup function if the sdl_init fails
 //	need to add a freeing/cleanup function if the window/renderer creation fails
@@ -254,7 +142,6 @@ void	update(t_main_info *main_info) {
 	update_scaleMatrix(main_info->scalingMatrix, main_info->scale);
 }
 
-
 int main(int argc, char **argv) {
 	t_main_info	main_info;
 
@@ -264,6 +151,7 @@ int main(int argc, char **argv) {
 		return (1);
 	}
 
+	
 	while (main_info.is_running) {
 		process_input(&main_info);
 		update(&main_info);

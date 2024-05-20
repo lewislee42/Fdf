@@ -64,11 +64,9 @@ int	getting_file_content(t_file_lst **full_lst, int fd) {
 
 void	getting_map(t_file_lst **full_lst, int *map_start, int *map_end, int *i) {
 	t_file_lst	*tmp = *full_lst;
-	int			map_checkres = 0;
 
 	while (tmp)  {
-		map_checkres = map_lines_check(tmp->s);
-		if (map_checkres == 1 && *map_end == 0) {
+		if (map_lines_check(tmp->s) == 1 && *map_end == 0) {
 			*map_end = *i;
 			break;
 		}
@@ -77,7 +75,8 @@ void	getting_map(t_file_lst **full_lst, int *map_start, int *map_end, int *i) {
 		// printf("%s", tmp->s);
 		// printf("res: %d\n", map_checkres);
 	}
-
+	tmp = tmp->prev;
+	// printf("\n\n %s \n\n", tmp->s);
 	// TODO:
 	while (tmp) {
 		if (white_space_check(tmp->s))
@@ -85,7 +84,7 @@ void	getting_map(t_file_lst **full_lst, int *map_start, int *map_end, int *i) {
 		(*map_end)--;
 		tmp = tmp->prev;
 	}
-	t_file_lst	*tmp = *full_lst;
+	tmp = *full_lst;
 	while (tmp) {
 		if (white_space_check(tmp->s))
 			break;
@@ -95,6 +94,15 @@ void	getting_map(t_file_lst **full_lst, int *map_start, int *map_end, int *i) {
 }
 
 void	freeing_arr2d(char **arr, int len) {
+	int i = 0;
+
+	while (i < len) {
+		free(arr[i++]);
+	}
+	free(arr);
+}
+
+void	freeing_arr2dint(int **arr, int len) {
 	int i = 0;
 
 	while (i < len) {
@@ -186,6 +194,100 @@ int	getting_map_info(t_file_lst *full_lst, int i, unsigned int *HighVal, unsigne
 	return (0);
 }
 
+int	find_longest_row(t_file_lst *full_lst, int map_start, int map_end) {
+	t_file_lst *tmp = full_lst;
+	int i = 0;
+	int counter = 1;
+	int	current = 0;
+	int longest = 0;
+	int	longIndex = 0;
+
+	while (i < map_start) {
+		tmp = tmp->next;
+		i++;
+	}
+
+	while (map_start < map_end) {
+		i = 0;
+		current = 0;
+		while (tmp->s[i]) {
+			if ((tmp->s[i] >= '0' && tmp->s[i] <= '9') && (tmp->s[i + 1] == ' ' || tmp->s[i + 1] == '\n')) {
+				current++;
+			}
+			i++;
+		}
+		if (current > longest) {
+			longest = current;
+			longIndex = counter;
+		}
+		counter++;
+		map_start++;
+		tmp = tmp->next;
+	}
+	return (longest);
+}
+
+int	populate_map(t_main_info *main_info, t_file_lst *full_lst, int map_start, int map_end) {
+	int i = 0;
+	int	j = 0;
+	t_file_lst *tmp = full_lst;
+	while (i < map_start && tmp) {
+		tmp = tmp->next;
+		i++;
+	}
+
+	main_info->map_x = find_longest_row(full_lst, map_start, map_end);
+	main_info->map_y = map_end - map_start;
+	// printf("map_x: %d, map_y: %d\n", main_info->map_x, main_info->map_y);
+	i = 0;
+	j = 0;
+	int stringI = 0;
+	main_info->map = malloc(sizeof(int *) * main_info->map_y);
+	if (!main_info->map) {
+		printf("ERROR: Failed to malloc map\n");
+		return (1);
+	}
+	while (i < map_end) {
+		main_info->map[i] = malloc(sizeof(int) * main_info->map_x);
+		if (!main_info->map[i]) {
+			freeing_arr2dint(main_info->map, i);
+			printf("ERROR: Failed to malloc map\n");
+			return (1);
+		}
+		j = 0;
+		stringI = 0;
+		while (j < main_info->map_x) {
+			if ((tmp->s + stringI)[0] != '\n') {
+				main_info->map[i][j] = ft_atoi(tmp->s + stringI);
+				while ((tmp->s[stringI] >= '0' && tmp->s[stringI] <= '9') || tmp->s[stringI] == '-') {
+					stringI++;
+				}
+				while (tmp->s[stringI] == ' ') {
+					stringI++;
+				}
+			}
+			else {
+				main_info->map[i][j] = 0;
+			}
+			j++;
+		}
+		tmp = tmp->next;
+		i++;
+	}
+	i = 0;
+	j = 0;
+	while (i < main_info->map_y) {
+		j = 0;
+		while (j < main_info->map_x) {
+			printf("%d ", main_info->map[i][j]);
+			j++;
+		}
+		printf("\n");
+		i++;
+	}
+	return (0);
+}
+
 int	validate_input(char **argv, t_main_info *main_info) {
 	t_file_lst	*full_lst = NULL;
 	int			fd;
@@ -222,27 +324,29 @@ int	validate_input(char **argv, t_main_info *main_info) {
 	int i = 0;
 	getting_map(&full_lst, &map_start, &map_end, &i);
 
-	unsigned int HighVal = 0;
-	unsigned int LowVal = 0;
-	if (getting_map_info(full_lst, i, &HighVal, &LowVal)) {
+	main_info->colorHigh = 0;
+	main_info->colorLow = 0;
+	if (getting_map_info(full_lst, i, &main_info->colorHigh, &main_info->colorLow)) {
 		ft_file_lstclear(&full_lst, free);
 		return (1);
 	}
 	printf("Passed: Getting map info\n");
 	
-	
-
-	printf("map start: %d | map end: %d | Highval: %x | LowVal: %x\n", map_start, map_end, HighVal, LowVal);
-	return (0);
-}
-
-int main(int argc, char **argv) {
-	t_main_info main_info;
-	if (validate_input(argv, &main_info)) {
-		printf("it failed a check\n");
+	printf("map start: %d | map end: %d | Highval: %x | LowVal: %x\n", map_start, map_end, main_info->colorHigh, main_info->colorLow);
+	if (populate_map(main_info, full_lst, map_start, map_end)) {
 		return (1);
 	}
+
 	return (0);
 }
+
+// int main(int argc, char **argv) {
+// 	t_main_info main_info;
+// 	if (validate_input(argv, &main_info)) {
+// 		printf("it failed a check\n");
+// 		return (1);
+// 	}
+// 	return (0);
+// }
 // NOTE LEFT OFF NEEDING TO DO MAP CONVERSION TO 2D ARRAY
 // NEED TO FIND MAP X AND Y

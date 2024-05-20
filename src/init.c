@@ -46,7 +46,7 @@ void	init_pos(t_main_info *main_info) {
 		while (j < main_info->map_x) {
 			main_info->points[i][j].x = j * 0.1;
 			main_info->points[i][j].y = i * 0.1;
-			main_info->points[i][j].z = (main_info->map[i][j] - 48) * 0.1;
+			main_info->points[i][j].z = main_info->map[i][j] * 0.1;
 			j++;
 		}
 		i++;
@@ -116,7 +116,7 @@ void	init_matrices(t_main_info *main_info) {
 
 	main_info->center.x = main_info->points[main_info->map_y / 2][main_info->map_x / 2].x;
 	main_info->center.y = main_info->points[main_info->map_y / 2][main_info->map_x / 2].y;
-	main_info->center.z =  ((main_info->map[main_info->map_y / 2][main_info->map_x / 2] - 48)) * 0.1;
+	main_info->center.z = main_info->points[main_info->map_y / 2][main_info->map_x / 2].z;
 
 	main_info->translationOrigin[0][0] = 1.0f;
 	main_info->translationOrigin[0][3] = -main_info->center.x;
