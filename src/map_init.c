@@ -72,20 +72,22 @@ void	getting_map(t_file_lst **full_lst, int *map_start, int *map_end, int *i) {
 		}
 		tmp = tmp->next;
 		(*i)++;
-		// printf("%s", tmp->s);
 		// printf("res: %d\n", map_checkres);
 	}
-	tmp = tmp->prev;
+	
 	// printf("\n\n %s \n\n", tmp->s);
+	if (tmp) {
+		tmp = tmp->prev;
+	}
 	// TODO:
-	while (tmp) {
+	while (tmp != NULL) {
 		if (white_space_check(tmp->s))
 			break;
 		(*map_end)--;
 		tmp = tmp->prev;
 	}
 	tmp = *full_lst;
-	while (tmp) {
+	while (tmp != NULL) {
 		if (white_space_check(tmp->s))
 			break;
 		(*map_start)++;
@@ -197,10 +199,8 @@ int	getting_map_info(t_file_lst *full_lst, int i, unsigned int *HighVal, unsigne
 int	find_longest_row(t_file_lst *full_lst, int map_start, int map_end) {
 	t_file_lst *tmp = full_lst;
 	int i = 0;
-	int counter = 1;
 	int	current = 0;
 	int longest = 0;
-	int	longIndex = 0;
 
 	while (i < map_start) {
 		tmp = tmp->next;
@@ -218,9 +218,7 @@ int	find_longest_row(t_file_lst *full_lst, int map_start, int map_end) {
 		}
 		if (current > longest) {
 			longest = current;
-			longIndex = counter;
 		}
-		counter++;
 		map_start++;
 		tmp = tmp->next;
 	}
@@ -238,7 +236,6 @@ int	populate_map(t_main_info *main_info, t_file_lst *full_lst, int map_start, in
 
 	main_info->map_x = find_longest_row(full_lst, map_start, map_end);
 	main_info->map_y = map_end - map_start;
-	// printf("map_x: %d, map_y: %d\n", main_info->map_x, main_info->map_y);
 	i = 0;
 	j = 0;
 	int stringI = 0;
@@ -274,17 +271,7 @@ int	populate_map(t_main_info *main_info, t_file_lst *full_lst, int map_start, in
 		tmp = tmp->next;
 		i++;
 	}
-	i = 0;
-	j = 0;
-	while (i < main_info->map_y) {
-		j = 0;
-		while (j < main_info->map_x) {
-			printf("%d ", main_info->map[i][j]);
-			j++;
-		}
-		printf("\n");
-		i++;
-	}
+
 	return (0);
 }
 
@@ -293,7 +280,8 @@ int	validate_input(char **argv, t_main_info *main_info) {
 	int			fd;
 
 	// checking file format
-	printf("%s\n", argv[1]);
+	printf("Doing map checks and init\n");
+	printf("-------------------------------\n");
 	if (!argv[1]) {
 		printf("ERROR: Incorrect amount of args\n");
 		return (1);
@@ -323,6 +311,7 @@ int	validate_input(char **argv, t_main_info *main_info) {
 	int map_end = 0;
 	int i = 0;
 	getting_map(&full_lst, &map_start, &map_end, &i);
+	printf("Passed: Getting map\n");
 
 	main_info->colorHigh = 0;
 	main_info->colorLow = 0;
@@ -331,12 +320,14 @@ int	validate_input(char **argv, t_main_info *main_info) {
 		return (1);
 	}
 	printf("Passed: Getting map info\n");
-	
-	printf("map start: %d | map end: %d | Highval: %x | LowVal: %x\n", map_start, map_end, main_info->colorHigh, main_info->colorLow);
+
 	if (populate_map(main_info, full_lst, map_start, map_end)) {
 		return (1);
 	}
 
+	printf("-------------------------------\n");
+	printf("Done :D\n");
+	printf("-------------------------------\n");
 	return (0);
 }
 

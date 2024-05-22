@@ -32,6 +32,27 @@ void	init_keys(t_main_info *main_info) {
 	main_info->keys.scaling.e = false;
 }
 
+static int	find_average_height(t_main_info *main_info) {
+	int i = 0;
+	int j = 0;
+	int highest = 0;
+	int lowest = 0;
+	while (i < main_info->map_y) {
+		j = 0;
+		while (j < main_info->map_x) {
+			if (lowest > main_info->map[i][j]) {
+				lowest = main_info->map[i][j];
+			}
+			else if (highest < main_info->map[i][j]) {
+				highest = main_info->map[i][j];
+			}
+			j++;
+		}
+		i++;
+	}
+	return ((highest + lowest) / 2);
+}
+
 // TODO: do error handling when malloc fails
 // height map needs changing
 void	init_pos(t_main_info *main_info) {
@@ -116,7 +137,8 @@ void	init_matrices(t_main_info *main_info) {
 
 	main_info->center.x = main_info->points[main_info->map_y / 2][main_info->map_x / 2].x;
 	main_info->center.y = main_info->points[main_info->map_y / 2][main_info->map_x / 2].y;
-	main_info->center.z = main_info->points[main_info->map_y / 2][main_info->map_x / 2].z;
+	// main_info->center.z = main_info->points[main_info->map_y / 2][main_info->map_x / 2].z;
+	main_info->center.z = (float)(find_average_height(main_info) * 0.1);
 
 	main_info->translationOrigin[0][0] = 1.0f;
 	main_info->translationOrigin[0][3] = -main_info->center.x;

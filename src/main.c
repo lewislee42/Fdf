@@ -147,7 +147,6 @@ int main(int argc, char **argv) {
 
 	(void)argc;
 	if (setup(argv, &main_info)) {
-		printf("Error: code %d\n", main_info.error_code);
 		return (1);
 	}
 
